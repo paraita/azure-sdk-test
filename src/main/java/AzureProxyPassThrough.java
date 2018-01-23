@@ -8,7 +8,17 @@ import com.microsoft.azure.management.Azure;
 public class AzureProxyPassThrough {
 
     public static void test1(String credFilePath) {
-        //String pathParaita = "/home/paraita/Bureau/support/CNES/azure_scaleset_activeeon.creds";
+        File activeeon_creds = new File(credFilePath);
+        Azure azure = null;
+        try {
+            azure = Azure.authenticate(activeeon_creds).withDefaultSubscription();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println(azure.subscriptionId());
+    }
+
+    public static void test2(int step, String credFilePath) {
         File activeeon_creds = new File(credFilePath);
         Azure azure = null;
         try {
@@ -45,6 +55,9 @@ public class AzureProxyPassThrough {
 
 
     public static void main(String[] args) {
-        test1(args[0]);
+        //String pathParaita = "/home/paraita/Bureau/support/CNES/azure_scaleset_activeeon.creds";
+        int step = Integer.valueOf(args[0]);
+        String credFilePath = args[1];
+        test2(step, credFilePath);
     }
 }

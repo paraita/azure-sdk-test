@@ -1,0 +1,25 @@
+Manifest-Version: 1.0
+Class-Path: azure-1.5.1.jar azure-client-runtime-1.2.1.jar client-runt
+ ime-1.2.1.jar guava-20.0.jar retrofit-2.1.0.jar okhttp-3.4.2.jar okio
+ -1.9.0.jar logging-interceptor-3.4.2.jar okhttp-urlconnection-3.4.2.j
+ ar converter-jackson-2.1.0.jar jackson-databind-2.7.2.jar jackson-dat
+ atype-joda-2.7.2.jar jackson-annotations-2.7.0.jar commons-lang3-3.4.
+ jar adapter-rxjava-2.1.0.jar slf4j-api-1.7.22.jar azure-client-authen
+ tication-1.2.1.jar adal4j-1.1.2.jar oauth2-oidc-sdk-4.5.jar mail-1.4.
+ 7.jar activation-1.1.jar jcip-annotations-1.0.jar json-smart-1.1.1.ja
+ r lang-tag-1.4.jar nimbus-jose-jwt-3.1.2.jar bcprov-jdk15on-1.51.jar 
+ gson-2.2.4.jar commons-codec-1.10.jar azure-annotations-1.2.0.jar azu
+ re-mgmt-resources-1.5.1.jar slf4j-simple-1.7.5.jar rxjava-1.2.4.jar h
+ ttpcore-4.4.5.jar azure-mgmt-storage-1.5.1.jar azure-mgmt-network-1.5
+ .1.jar azure-mgmt-compute-1.5.1.jar azure-mgmt-graph-rbac-1.5.1.jar a
+ zure-mgmt-keyvault-1.5.1.jar azure-mgmt-batch-1.5.1.jar azure-mgmt-tr
+ afficmanager-1.5.1.jar azure-mgmt-dns-1.5.1.jar azure-mgmt-redis-1.5.
+ 1.jar azure-mgmt-appservice-1.5.1.jar azure-mgmt-locks-1.5.1.jar azur
+ e-mgmt-cdn-1.5.1.jar azure-mgmt-sql-1.5.1.jar azure-mgmt-containerins
+ tance-1.5.1.jar azure-storage-6.1.0.jar jackson-core-2.6.0.jar azure-
+ keyvault-core-0.8.0.jar azure-mgmt-containerregistry-1.5.1.jar azure-
+ mgmt-containerservice-1.5.1.jar azure-mgmt-cosmosdb-1.5.1.jar azure-m
+ gmt-search-1.5.1.jar azure-mgmt-msi-1.5.1.jar azure-mgmt-servicebus-1
+ .5.1.jar joda-time-2.1.jar
+Main-Class: main.java.AzureProxyPassThrough
+
