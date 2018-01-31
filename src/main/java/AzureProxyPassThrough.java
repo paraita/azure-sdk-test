@@ -373,16 +373,20 @@ public class AzureProxyPassThrough {
     }
 
     public static void test6(Map<String, String> params) {
-        System.out.println("Running test6:");
+        System.out.println("Running test6 with more logs:");
         File activeeon_creds = new File(params.get("credFilePath"));
 
         Azure azure = null;
         try {
             ApplicationTokenCredentials credentials = ApplicationTokenCredentials.fromFile(activeeon_creds);
-            Azure.Authenticated authenticated = Azure.authenticate(credentials);
+            Azure.Authenticated authenticated = Azure
+                    .configure()
+                    .withLogLevel(LogLevel.BODY_AND_HEADERS)
+                    .authenticate(credentials);
             System.out.println("Authenticated using tenantId [" + authenticated.tenantId() + "]");
-            azure = authenticated.withDefaultSubscription();
-            System.out.println("Authentication step is finished");
+            System.out.println("Configuring to subscription [" + credentials.defaultSubscriptionId() + "]");
+            azure = authenticated.withSubscription(credentials.defaultSubscriptionId());
+            System.out.println("Authentication/configuration succeeded");
             System.out.println("Listing the resources groups:");
             PagedList<ResourceGroup> rgList = azure.resourceGroups().list();
             rgList.loadAll();
