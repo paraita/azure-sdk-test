@@ -77,6 +77,9 @@ public class AzureProxyPassThrough {
                 params.put("clientId", args[6]);
                 params.put("password", args[7]);
                 break;
+            case "test6":
+                params.put("credFilePath", args[5]);
+                break;
             default:
                 break;
         }
@@ -370,37 +373,24 @@ public class AzureProxyPassThrough {
     }
 
     public static void test6(Map<String, String> params) {
-        System.out.println("Running test5:");
-        String tenantId = params.get("tenantId");
-        String clientId = params.get("clientId");
-        String password = params.get("password");
-        AuthenticationContext authContext = null;
-        AuthenticationResult authResult = null;
-        ExecutorService service = null;
-        try {
-            service = Executors.newFixedThreadPool(1);
-            String url = "https://login.microsoftonline.com/" + tenantId + "/oauth2/authorize";
-            System.out.println("Authentication to " + url);
-            authContext = new AuthenticationContext(url, false, service);
-            ClientCredential clientCredential = new ClientCredential(clientId, password);
-            Future<AuthenticationResult> future =  authContext.acquireToken("https://management.azure.com",
-                    clientCredential, new AuthenticationCallback() {
-                        @Override
-                        public void onSuccess(AuthenticationResult result) {
-                            System.out.println("Token acquired ! " + result.getAccessToken());
-                        }
+        System.out.println("Running test6:");
+        File activeeon_creds = new File(params.get("credFilePath"));
 
-                        @Override
-                        public void onFailure(Throwable exc) {
-                            System.out.println("Token acquisition failed ! ");
-                            exc.printStackTrace();
-                        }
-                    });
-            authResult = future.get();
+        Azure azure = null;
+        try {
+            ApplicationTokenCredentials credentials = ApplicationTokenCredentials.fromFile(activeeon_creds);
+            Azure.Authenticated authenticated = Azure.authenticate(credentials);
+            System.out.println("Authenticated using tenantId [" + authenticated.tenantId() + "]");
+            azure = authenticated.withDefaultSubscription();
+            System.out.println("Authentication step is finished");
+            System.out.println("Listing the resources groups:");
+            PagedList<ResourceGroup> rgList = azure.resourceGroups().list();
+            rgList.loadAll();
+            for (ResourceGroup resourceGroup: rgList.currentPage().items()) {
+                System.out.println("    - " + resourceGroup.name() + "(" + resourceGroup.regionName() + ")");
+            }
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            service.shutdown();
         }
 
     }
@@ -430,6 +420,9 @@ public class AzureProxyPassThrough {
                 break;
             case "test5":
                 test5(params);
+                break;
+            case "test6":
+                test6(params);
                 break;
             default:
                 System.out.println("Unknown test ! (" + testToRun + ")");
