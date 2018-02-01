@@ -6,8 +6,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.Authenticator;
+import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
+import java.net.Proxy;
+import java.net.SocketAddress;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -103,7 +106,7 @@ public class AzureProxyPassThrough {
         );
 
         System.setProperty("jdk.http.auth.tunneling.disabledSchemes", "");
-        System.setProperty("com.sun.net.ssl.checkRevocation", "false");
+//        System.setProperty("com.sun.net.ssl.checkRevocation", "false");
 
         // HTTP
         System.setProperty("http.proxyHost", params.get("proxyHost"));
@@ -408,13 +411,24 @@ public class AzureProxyPassThrough {
     public static void test7(Map<String, String> params) {
         System.out.println("Running test7 with more logs:");
         File activeeon_creds = new File(params.get("credFilePath"));
-
+        System.setProperty("jdk.http.auth.tunneling.disabledSchemes", "");
+        Authenticator.setDefault(
+                new Authenticator() {
+                    @Override
+                    public PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(params.get("proxyUser"),
+                                params.get("proxyPassword").toCharArray());
+                    }
+                }
+        );
         Azure azure = null;
         try {
             ApplicationTokenCredentials credentials = ApplicationTokenCredentials.fromFile(activeeon_creds);
             Azure.Authenticated authenticated = Azure
                     .configure()
                     .withLogLevel(LogLevel.BODY_AND_HEADERS)
+                    .withProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(params.get("proxyHost"),
+                            Integer.valueOf(params.get("proxyPort")))))
                     .withProxyAuthenticator(new okhttp3.Authenticator() {
                         @Override
                         public Request authenticate(Route route, Response response) throws IOException {
@@ -428,7 +442,7 @@ public class AzureProxyPassThrough {
                     .authenticate(credentials);
             System.out.println("Authenticated using tenantId [" + authenticated.tenantId() + "]");
             System.out.println("Configuring to subscription [" + credentials.defaultSubscriptionId() + "]");
-            azure = authenticated.withSubscription(credentials.defaultSubscriptionId());
+            azure = authenticated.withDefaultSubscription();
             System.out.println("Authentication/configuration succeeded");
             System.out.println("Listing the resources groups:");
             PagedList<ResourceGroup> rgList = azure.resourceGroups().list();
@@ -447,7 +461,7 @@ public class AzureProxyPassThrough {
 
         String testToRun = args[0];
         Map<String, String> params = getParams(args);
-        setProxy(params);
+        //setProxy(params);
 
         switch (testToRun) {
             case "curlUrl":
