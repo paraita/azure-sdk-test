@@ -51,7 +51,11 @@ import com.microsoft.azure.serializer.AzureJacksonAdapter;
 import com.microsoft.rest.LogLevel;
 import com.microsoft.rest.RestClient;
 
+import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.Route;
 import retrofit2.Retrofit;
 
 public class AzureProxyPassThrough {
@@ -78,6 +82,7 @@ public class AzureProxyPassThrough {
                 params.put("password", args[7]);
                 break;
             case "test6":
+            case "test7":
                 params.put("credFilePath", args[5]);
                 break;
             default:
@@ -400,6 +405,42 @@ public class AzureProxyPassThrough {
 
     }
 
+    public static void test7(Map<String, String> params) {
+        System.out.println("Running test7 with more logs:");
+        File activeeon_creds = new File(params.get("credFilePath"));
+
+        Azure azure = null;
+        try {
+            ApplicationTokenCredentials credentials = ApplicationTokenCredentials.fromFile(activeeon_creds);
+            Azure.Authenticated authenticated = Azure
+                    .configure()
+                    .withLogLevel(LogLevel.BODY_AND_HEADERS)
+                    .withProxyAuthenticator(new okhttp3.Authenticator() {
+                        @Override
+                        public Request authenticate(Route route, Response response) throws IOException {
+                            String credential = Credentials.basic(params.get("proxyUser"),
+                                    params.get("proxyPassword"));
+                            return response.request().newBuilder()
+                                    .header("Proxy-Authorization", credential)
+                                    .build();
+                        }
+                    })
+                    .authenticate(credentials);
+            System.out.println("Authenticated using tenantId [" + authenticated.tenantId() + "]");
+            System.out.println("Configuring to subscription [" + credentials.defaultSubscriptionId() + "]");
+            azure = authenticated.withSubscription(credentials.defaultSubscriptionId());
+            System.out.println("Authentication/configuration succeeded");
+            System.out.println("Listing the resources groups:");
+            PagedList<ResourceGroup> rgList = azure.resourceGroups().list();
+            rgList.loadAll();
+            for (ResourceGroup resourceGroup: rgList.currentPage().items()) {
+                System.out.println("    - " + resourceGroup.name() + "(" + resourceGroup.regionName() + ")");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public static void main(String[] args) {
         //String pathParaita = "/home/paraita/Bureau/support/CNES/azure_scaleset_activeeon.creds";
@@ -428,6 +469,9 @@ public class AzureProxyPassThrough {
                 break;
             case "test6":
                 test6(params);
+                break;
+            case "test7":
+                test7(params);
                 break;
             default:
                 System.out.println("Unknown test ! (" + testToRun + ")");
