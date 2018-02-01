@@ -386,6 +386,7 @@ public class AzureProxyPassThrough {
             System.out.println("Authenticated using tenantId [" + authenticated.tenantId() + "]");
             System.out.println("Configuring to subscription [" + credentials.defaultSubscriptionId() + "]");
             azure = authenticated.withSubscription(credentials.defaultSubscriptionId());
+//            azure = authenticated.withDefaultSubscription();
             System.out.println("Authentication/configuration succeeded");
             System.out.println("Listing the resources groups:");
             PagedList<ResourceGroup> rgList = azure.resourceGroups().list();
